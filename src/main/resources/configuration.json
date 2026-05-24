@@ -1,0 +1,29 @@
+{
+	"rs232": {
+		"port": ""
+	},
+	"serverSocket": {
+		"ip": "127.0.0.1",
+		"port": "2003"
+	},
+	"clientSocket": {
+		"ip": "127.0.0.1",
+		"port": "2003"
+	},
+	"websocketServer": {
+		"ip": "127.0.0.1",
+		"port": "2007"
+	},
+	"websocketClient": {
+		"ip": "127.0.0.1",
+		"port": "2007"
+	},
+	"mqttBroker": {
+		"ip": "127.0.0.1",
+		"port": "2011"
+	},
+	"mqttClient": {
+		"ip": "127.0.0.1",
+		"port": "2011"
+	}
+}
