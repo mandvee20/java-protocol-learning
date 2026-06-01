@@ -1,6 +1,7 @@
 {
 	"rs232": {
-		"port": ""
+		"port": "/dev/ttyUSB1",
+		"baudrate": 9600
 	},
 	"serverSocket": {
 		"ip": "127.0.0.1",
@@ -23,7 +24,12 @@
 		"port": "2011"
 	},
 	"mqttClient": {
-		"ip": "127.0.0.1",
-		"port": "2011"
+		"connectionProtocol": "TCP",
+		"certificateValidationType": "IGNORE_CERTIFICATE",
+		"user": "test",
+		"pwd": "test123",
+		"ip": "10.81.2.251",
+		"port": "1883",
+		"fqdn" : ""
 	}
 }

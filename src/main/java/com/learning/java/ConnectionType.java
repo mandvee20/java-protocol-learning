@@ -31,7 +31,7 @@ public enum ConnectionType {
 				}
 			}
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 		return NONE;
 	}

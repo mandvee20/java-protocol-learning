@@ -1,5 +1,7 @@
 package com.learning.java;
 
+import com.learning.java.connection.mqtt.MqttConnection;
+
 /**
  * @author Mandvee Vatsa
  * @date 22-May-2026 2:32:36 pm
@@ -27,6 +29,7 @@ public class UserInputProcessor {
 		case WEBSOCKET_SERVER:
 			break;
 		case MQTT_CLIENT:
+			MqttConnection.getInstance().makeConnection();
 			break;
 		case MQTT_BROKER:
 			break;
