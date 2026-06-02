@@ -10,15 +10,15 @@ import org.apache.commons.lang3.StringUtils;
 
 public class Application {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		if (ArrayUtils.isNotEmpty(args) && StringUtils.isNotBlank(args[0])) {
-			UserInputProcessor.getInstance().processRequest(args[0]);
-		} else {
-			Initiallizer.getInstance().printAvailableTopics();
-			Initiallizer.getInstance().startAcceptingUserInputs();
-		}
+        if (ArrayUtils.isNotEmpty(args) && StringUtils.isNotBlank(args[0])) {
+            UserInputProcessor.getInstance().processRequest(args[0]);
+        } else {
+            Initiallizer.getInstance().printAvailableTopics();
+            Initiallizer.getInstance().startAcceptingUserInputs();
+        }
 
-	}
+    }
 
 }

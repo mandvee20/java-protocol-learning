@@ -11,42 +11,42 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class Initiallizer {
-	private static Initiallizer initiallizerObj = null;
-	ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(0);
+    private static Initiallizer initiallizerObj = null;
+    ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(0);
 
-	// Lazy Initialization with Double-Checked Locking
-	public static Initiallizer getInstance() {
-		if (Objects.isNull(initiallizerObj)) {
-			synchronized (Initiallizer.class) {
-				if (Objects.isNull(initiallizerObj)) {
-					initiallizerObj = new Initiallizer();
-				}
-			}
-		}
-		return initiallizerObj;
-	}
+    private Initiallizer() {
+        executor.setMaximumPoolSize(1);
+        executor.setKeepAliveTime(20, TimeUnit.MILLISECONDS);
+    }
 
-	private Initiallizer() {
-		executor.setMaximumPoolSize(1);
-		executor.setKeepAliveTime(20, TimeUnit.MILLISECONDS);
-	}
+    // Lazy Initialization with Double-Checked Locking
+    public static Initiallizer getInstance() {
+        if (Objects.isNull(initiallizerObj)) {
+            synchronized (Initiallizer.class) {
+                if (Objects.isNull(initiallizerObj)) {
+                    initiallizerObj = new Initiallizer();
+                }
+            }
+        }
+        return initiallizerObj;
+    }
 
-	public void printAvailableTopics() {
-		Arrays.asList(ConnectionType.values()).forEach(topic -> {
-			System.out.println("Enter \"" + topic.getConnectionType() + "\" To Learn About " + topic);
-		});
-	}
+    public void printAvailableTopics() {
+        Arrays.asList(ConnectionType.values()).forEach(topic -> {
+            System.out.println("Enter \"" + topic.getConnectionType() + "\" To Learn About " + topic);
+        });
+    }
 
-	public void startAcceptingUserInputs() {
-		executor.execute(new UserInputReader());
-	}
-	
-	public void fetchConfigObject() {
-		try {
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public void startAcceptingUserInputs() {
+        executor.execute(new UserInputReader());
+    }
+
+    public void fetchConfigObject() {
+        try {
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

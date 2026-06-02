@@ -9,31 +9,31 @@ import org.apache.commons.lang3.StringUtils;
 
 public enum ConnectionType {
 
-	RS232("RS232"), SERVER_SOCKET("Server Socket"), CLIENT_SOCKET("Client Socket"),
-	WEBSOCKET_CLIENT("Websocket Client"), WEBSOCKET_SERVER("Websocket Server"), MQTT_CLIENT("MQTT Client"),
-	MQTT_BROKER("MQTT Broker"), NONE("");
+    RS232("RS232"), SERVER_SOCKET("Server Socket"), CLIENT_SOCKET("Client Socket"),
+    WEBSOCKET_CLIENT("Websocket Client"), WEBSOCKET_SERVER("Websocket Server"), MQTT_CLIENT("MQTT Client"),
+    MQTT_BROKER("MQTT Broker"), NONE("");
 
-	private String connectionType;
+    private String connectionType;
 
-	ConnectionType(String connectionType) {
-		this.connectionType = connectionType;
-	}
+    ConnectionType(String connectionType) {
+        this.connectionType = connectionType;
+    }
 
-	public String getConnectionType() {
-		return connectionType;
-	}
+    public static ConnectionType fromString(String connectionType) {
+        try {
+            for (ConnectionType connectiontype : ConnectionType.values()) {
+                if (StringUtils.containsIgnoreCase(connectiontype.getConnectionType(), connectionType)) {
+                    return connectiontype;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return NONE;
+    }
 
-	public static ConnectionType fromString(String connectionType) {
-		try {
-			for (ConnectionType connectiontype : ConnectionType.values()) {
-				if (StringUtils.containsIgnoreCase(connectiontype.getConnectionType(), connectionType)) {
-					return connectiontype;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return NONE;
-	}
+    public String getConnectionType() {
+        return connectionType;
+    }
 
 }

@@ -23,8 +23,7 @@ public class Constants {
     /**
      * Common Protocols For Connection
      **/
-    public enum ConnectionProtocols
-    {
+    public enum ConnectionProtocols {
 
         TCP,
         MQTT,
@@ -32,46 +31,36 @@ public class Constants {
         SSL;
 
 
-        public static ConnectionProtocols fromString(String request)
-        {
-            try
-            {
-                for (ConnectionProtocols protocol : ConnectionProtocols.values())
-                {
+        public static ConnectionProtocols fromString(String request) {
+            try {
+                for (ConnectionProtocols protocol : ConnectionProtocols.values()) {
                     if (StringUtils.equalsIgnoreCase(protocol.name(), request))
                         return protocol;
                 }
                 return TCP;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 return TCP;
             }
         }
     }
+
     /**
      * Certificate Validation Type for SSL Connection
      **/
-    public enum CertificateValidationType
-    {
+    public enum CertificateValidationType {
 
         VALIDATE_CERTIFICATE,
         IGNORE_CERTIFICATE;
 
-        public static CertificateValidationType fromString(String request)
-        {
-            try
-            {
+        public static CertificateValidationType fromString(String request) {
+            try {
                 for (CertificateValidationType type : CertificateValidationType
-                        .values())
-                {
+                        .values()) {
                     if (StringUtils.equalsIgnoreCase(type.name(), request))
                         return type;
                 }
                 return IGNORE_CERTIFICATE;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 return IGNORE_CERTIFICATE;
             }
         }

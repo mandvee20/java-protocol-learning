@@ -7,10 +7,10 @@ package com.learning.java.connection;
 
 public interface Connection {
 
-	public boolean makeConnection();
+    public boolean makeConnection();
 
-	public String readResponse();
+    public String readResponse();
 
-	public void writeRequest();
+    public void writeRequest();
 
 }

@@ -1,11 +1,13 @@
 package com.learning.java.connection.serial;
 
-import com.fazecast.jSerialComm.SerialPort;
 import com.learning.java.Constants;
-
+//import gnu.io.CommPortIdentifier;
+//import gnu.io.RXTXCommDriver;
+//import gnu.io.SerialPort;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -16,31 +18,27 @@ import java.util.Objects;
 
 /**
  * @author Mandvee Vatsa
- * @date 2-June-2026 2:32:36 pm
+ * @date 22-May-2026 2:32:36 pm
  */
+public class SerialConnectionRxTx {
 
-public class SerialConnection {
-
-
-    private static SerialConnection serialCon;
+    private static SerialConnectionRxTx serialCon;
     private Integer baudrate = 9600;
-    private String port = "/dev/ttyUSB0";
+    private String port = "/dev/ttyUSB1";
     private boolean isConnected;
     private InputStream inputStream;
     private OutputStream outputStream;
     private int connectionTimeoutInMS = 300000; //In MilliSeconds
-    private SerialPort serialPort;
 
-
-    private SerialConnection() {
+    private SerialConnectionRxTx() {
         loadConnectionInfo();
     }
 
-    public static SerialConnection getInstance() {
+    public static SerialConnectionRxTx getInstance() {
         if (Objects.isNull(serialCon)) {
-            synchronized (SerialConnection.class) {
+            synchronized (SerialConnectionRxTx.class) {
                 if (Objects.isNull(serialCon)) {
-                    serialCon = new SerialConnection();
+                    serialCon = new SerialConnectionRxTx();
                 }
             }
         }
@@ -73,67 +71,30 @@ public class SerialConnection {
 
     private void connect() {
         try {
-
-            for (SerialPort p : SerialPort.getCommPorts()) {
-                System.out.println(p.getSystemPortPath());
-            }
-
             System.out.println("Going to make Serial Connection !!");
-            System.out.println("Port: " + port);
-            System.out.println("Baudrate: " + baudrate);
-
-            serialPort = SerialPort.getCommPort(port);
-
-            serialPort.setComPortParameters(
-                    baudrate,
-                    8,
-                    SerialPort.ONE_STOP_BIT,
-                    SerialPort.NO_PARITY
-            );
-
-            serialPort.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
-
-            serialPort.setComPortTimeouts(
-                    SerialPort.TIMEOUT_READ_SEMI_BLOCKING,
-                    1000,
-                    1000
-            );
-
-            if (serialPort.openPort()) {
-
-                inputStream = serialPort.getInputStream();
-                outputStream = serialPort.getOutputStream();
-
-                isConnected = true;
-
-                System.out.println("Connected to " + port);
-
-            } else {
-                System.out.println("Failed to open port " + port + "Error Code: " + serialPort.getLastErrorCode() + "Error Location: " + serialPort.getLastErrorLocation());
-                isConnected = false;
-            }
+//            File portFile = new File(port);
+//            if (portFile.exists()) {
+//                CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(port);
+//
+//                SerialPort serialport = (SerialPort) portIdentifier.open("Java Learning Portal", connectionTimeoutInMS);
+//                serialport.setSerialPortParams(baudrate, serialport.DATABITS_8, serialport.STOPBITS_1,
+//                        serialport.PARITY_NONE);
+////				serialport.setRTS(true);
+//                serialport.setFlowControlMode(serialport.FLOWCONTROL_NONE);
+//                isConnected = Boolean.TRUE;
+//                inputStream = serialport.getInputStream();
+//                outputStream = serialport.getOutputStream();
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            isConnected = false;
         }
     }
-
-    /* This Exception Occurs when Port is Not Available */
-/*    com.fazecast.jSerialComm.SerialPortInvalidPortException: Unable to create a serial port object from the invalid port descriptor: /dev/ttyUSB1
-    at com.fazecast.jSerialComm.SerialPort.getCommPort(SerialPort.java:549)
-    at com.learning.java.connection.serial.SerialConnection.connect(SerialConnection.java:86)
-    at com.learning.java.connection.serial.SerialConnection.reconnect(SerialConnection.java:154)
-    at com.learning.java.connection.serial.SerialConnection.lambda$makeConnection$2(SerialConnection.java:67)
-    at java.base/java.lang.Thread.run(Thread.java:1583)
-    Caused by: java.io.IOException
-    at com.fazecast.jSerialComm.SerialPort.getCommPort(SerialPort.java:534)
-            ... 4 more*/
 
     private void loadConnectionInfo() {
         try {
             // Read file from src/main/resources
-            URL filePath = SerialConnection.class.getClassLoader()
+            URL filePath = SerialConnectionRxTx.class.getClassLoader()
                     .getResource(Constants.CONFIG_FILE);
 
             // Convert file content into String
@@ -149,8 +110,53 @@ public class SerialConnection {
             // Fetch fields
             port = rs232.getString(Constants.PORT);
             baudrate = rs232.getInt(Constants.BAUDRATE);
+            initRxTX();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
+    private void initRxTX() {
+        try {
+            System.out.println(
+                    "SerialPorts = " +
+                            System.getProperty("gnu.io.rxtx.SerialPorts")
+            );
+
+            System.out.println(
+                    "ParallelPorts = " +
+                            System.getProperty("gnu.io.rxtx.ParallelPorts")
+            );
+            System.setProperty("gnu.io.rxtx.SerialPorts", port);
+            System.setProperty("gnu.io.rxtx.ParallelPorts", "");
+
+            System.out.println(System.getProperty("java.version"));
+//            RXTXCommDriver rxtx = new RXTXCommDriver();
+            System.out.println("java.ext.dirs Property: " + System.getProperty("java.ext.dirs"));
+//            System.setProperty("java.ext.dirs", port);
+            System.out.println("java.ext.dirs Property: " + System.getProperty("java.ext.dirs"));
+            System.out.println("path.separator Property: " + System.getProperty("path.separator"));
+            System.out.println("file.separator Property: " + System.getProperty("file.separator"));
+            System.out.println("Port: " + port);
+            System.out.println("Baudrate: " + baudrate);
+
+            File lockF = new File("/var/lock/LCK.." + port);
+            if (lockF.exists()) {
+                System.out.println("Deleting Lock File " + lockF.getName());
+                lockF.delete();
+            }
+            System.out.println(
+                    "SerialPorts = " +
+                            System.getProperty("gnu.io.rxtx.SerialPorts")
+            );
+
+            System.out.println(
+                    "ParallelPorts = " +
+                            System.getProperty("gnu.io.rxtx.ParallelPorts")
+            );
+//            rxtx.initialize();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -278,63 +284,4 @@ public class SerialConnection {
         }
         return byteArray;
     }
-
-    private void disconnect() {
-
-        try {
-
-            if (inputStream != null) {
-                inputStream.close();
-            }
-
-            if (outputStream != null) {
-                outputStream.close();
-            }
-
-            if (serialPort != null) {
-                serialPort.closePort();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        isConnected = false;
-    }
-
-//    cat /var/lock/
-//    asound.state.lock  card0.lock         subsys/            whoopsie/
-//
-//    cat /dev/tty
-//    tty        tty13      tty19      tty24      tty3       tty35      tty40      tty46      tty51      tty57      tty62      ttyS0      ttyS14     ttyS2      ttyS25     ttyS30     ttyS8
-//    tty0       tty14      tty2       tty25      tty30      tty36      tty41      tty47      tty52      tty58      tty63      ttyS1      ttyS15     ttyS20     ttyS26     ttyS31     ttyS9
-//    tty1       tty15      tty20      tty26      tty31      tty37      tty42      tty48      tty53      tty59      tty7       ttyS10     ttyS16     ttyS21     ttyS27     ttyS4
-//    tty10      tty16      tty21      tty27      tty32      tty38      tty43      tty49      tty54      tty6       tty8       ttyS11     ttyS17     ttyS22     ttyS28     ttyS5
-//    tty11      tty17      tty22      tty28      tty33      tty39      tty44      tty5       tty55      tty60      tty9       ttyS12     ttyS18     ttyS23     ttyS29     ttyS6
-//    tty12      tty18      tty23      tty29      tty34      tty4       tty45      tty50      tty56      tty61      ttyprintk  ttyS13     ttyS19     ttyS24     ttyS3      ttyS7
-//
-//    cat /dev/ttyUSB0
-//    cat: /dev/ttyUSB0: Permission denied
-//
-//    ls -l /dev/ttyUSB*
-//    crw-rw---- 1 root dialout 188, 0 Jun  2 13:02 /dev/ttyUSB0
-//
-//    dmesg | grep tty
-//    dmesg: read kernel buffer failed: Operation not permitted
-//
-//    sudo dmesg | grep tty
-//            [611709.278405] usb 3-9: FTDI USB Serial Device converter now attached to ttyUSB0
-//            [611774.266561] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
-//            [611864.298230] usb 3-9: FTDI USB Serial Device converter now attached to ttyUSB0
-//            [615224.729581] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
-//            [616230.702615] usb 3-9: FTDI USB Serial Device converter now attached to ttyUSB0
-//            [616599.134125] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
-//            [616615.558486] usb 3-9: FTDI USB Serial Device converter now attached to ttyUSB0
-//            [616697.705894] ftdi_sio ttyUSB0: FTDI USB Serial Device converter now disconnected from ttyUSB0
-//            [616699.837784] usb 3-9: FTDI USB Serial Device converter now attached to ttyUSB0
-//
-//    sudo chmod 777 /dev/
-//    sudo chmod 777 /dev/ttyUSB0
-
-
 }

@@ -1,35 +1,35 @@
 {
-	"rs232": {
-		"port": "/dev/ttyUSB1",
-		"baudrate": 9600
-	},
-	"serverSocket": {
-		"ip": "127.0.0.1",
-		"port": "2003"
-	},
-	"clientSocket": {
-		"ip": "127.0.0.1",
-		"port": "2003"
-	},
-	"websocketServer": {
-		"ip": "127.0.0.1",
-		"port": "2007"
-	},
-	"websocketClient": {
-		"ip": "127.0.0.1",
-		"port": "2007"
-	},
-	"mqttBroker": {
-		"ip": "127.0.0.1",
-		"port": "2011"
-	},
-	"mqttClient": {
-		"connectionProtocol": "TCP",
-		"certificateValidationType": "IGNORE_CERTIFICATE",
-		"user": "test",
-		"pwd": "test123",
-		"ip": "10.81.2.251",
-		"port": "1883",
-		"fqdn" : ""
-	}
+  "rs232": {
+    "port": "/dev/ttyUSB0",
+    "baudrate": 9600
+  },
+  "serverSocket": {
+    "ip": "127.0.0.1",
+    "port": "2003"
+  },
+  "clientSocket": {
+    "ip": "127.0.0.1",
+    "port": "2003"
+  },
+  "websocketServer": {
+    "ip": "127.0.0.1",
+    "port": "2007"
+  },
+  "websocketClient": {
+    "ip": "127.0.0.1",
+    "port": "2007"
+  },
+  "mqttBroker": {
+    "ip": "127.0.0.1",
+    "port": "2011"
+  },
+  "mqttClient": {
+    "connectionProtocol": "SSL",
+    "certificateValidationType": "VALIDATE_CERTIFICATE",
+    "user": "dvcsforoccupancy",
+    "pwd": "pA55for0ccu",
+    "ip": "10.81.2.251",
+    "port": "8883",
+    "fqdn": "mqtt.digivalet.in"
+  }
 }

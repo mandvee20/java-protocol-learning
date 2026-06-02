@@ -1,7 +1,6 @@
 package com.learning.java.connection.mqtt;
 
 import com.learning.java.Constants;
-import com.learning.java.connection.serial.SerialConnection;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +30,15 @@ import java.util.UUID;
  * @date 22-May-2026 2:32:36 pm
  */
 public class MqttConnection {
+    public static final String CLIENTID = UUID.randomUUID().toString();
     private static MqttConnection mqttConnection;
+    public int publishQOS = 1;
+    public String disconnectionTopic = "mqtt/broker/disconnect";
+    public String disconnectionMessage = "Mqtt Broker Disconnected";
+    MqttDefaultFilePersistence persistence;
+    int[] subscribeQOS = new int[]{1};
+    String[] topicsToSubscribe =
+            new String[]{"#"};
     private String ip = "127.0.0.1";
     private String fqdn = "mqtt.mandvee.in";
     private String port = "1883";
@@ -39,36 +46,26 @@ public class MqttConnection {
     private String pwd = "abcd";
     @Setter
     private boolean isConnected = false;
-    public static final String CLIENTID = UUID.randomUUID().toString();
-
     private String broker;
     private Constants.ConnectionProtocols connectionProtocol;
     private Constants.CertificateValidationType certValidationType =
             Constants.CertificateValidationType.IGNORE_CERTIFICATE;
-    private String certificatePath = "/etc/ssl/project_casadigi_com/mqtt.crt";
-    public int publishQOS = 1;
+    private String certificatePath = "/etc/ssl/certs/project_java_protocol_learning_com/mqtt.crt";
     @Getter
     private MqttClient client;
     private MqttConnectionOptions options;
     private MqttCallbackImpl callBackImpl = new MqttCallbackImpl();
-    MqttDefaultFilePersistence persistence;
-    int[] subscribeQOS = new int[] {1};
-
-    String[] topicsToSubscribe =
-            new String[] {"#"};
-    public String disconnectionTopic = "mqtt/broker/disconnect";
-    public String disconnectionMessage = "Mqtt Broker Disconnected";
     private long deviceReconnectDelay = 20000;
     private int connectionTimeout = 10; // In Seconds
 
-    private MqttConnection(){
+    private MqttConnection() {
         loadConnectionInfo();
     }
 
-    public static  MqttConnection getInstance(){
-        if(Objects.isNull(mqttConnection)){
-            synchronized (MqttConnection.class){
-                if(Objects.isNull(mqttConnection)){
+    public static MqttConnection getInstance() {
+        if (Objects.isNull(mqttConnection)) {
+            synchronized (MqttConnection.class) {
+                if (Objects.isNull(mqttConnection)) {
                     mqttConnection = new MqttConnection();
                 }
             }
@@ -77,7 +74,7 @@ public class MqttConnection {
     }
 
 
-    private void loadConnectionInfo(){
+    private void loadConnectionInfo() {
         try {
             // Read file from src/main/resources
             URL filePath = MqttConnection.class.getClassLoader()
@@ -117,7 +114,7 @@ public class MqttConnection {
                         .concat(Constants.URL_SEPARATOR).concat(url)
                         .concat(Constants.COLON).concat(port);
 
-            System.out.println("Broker URL : "+ broker);
+            System.out.println("Broker URL : " + broker);
 
             /** BROKER FQDN URL: "ssl://mqtt.mandvee.in:8883" **/
             /** BROKER IP URL: "tcp://10.11.12.13:1883" **/
@@ -128,10 +125,8 @@ public class MqttConnection {
     }
 
 
-    private void connect() throws MqttException
-    {
-        switch (connectionProtocol)
-        {
+    private void connect() throws MqttException {
+        switch (connectionProtocol) {
             case SSL:
                 sslConnect();
                 break;
@@ -142,8 +137,8 @@ public class MqttConnection {
 
     }
 
-    public void makeConnection(){
-        try{
+    public void makeConnection() {
+        try {
 
             new Thread(() -> {
                 Thread.currentThread().setName("Writer");
@@ -160,10 +155,10 @@ public class MqttConnection {
         }
     }
 
-    private void reconnect(){
-        try{
-            while(true){
-                if(!isConnected){
+    private void reconnect() {
+        try {
+            while (true) {
+                if (!isConnected) {
                     connect();
                 }
                 Thread.sleep(1000);
@@ -174,11 +169,10 @@ public class MqttConnection {
     }
 
 
-
-    private void writeData(){
-        try{
-            while(true){
-                if(isConnected){
+    private void writeData() {
+        try {
+            while (true) {
+                if (isConnected) {
 //                    publishData("writing/heartbeat", "Hello!");
                 }
                 Thread.sleep(60000);
@@ -188,8 +182,7 @@ public class MqttConnection {
         }
     }
 
-    private void tcpConnect() throws MqttException
-    {
+    private void tcpConnect() throws MqttException {
 
         client = new MqttClient(broker, CLIENTID, persistence);
         options = new MqttConnectionOptionsBuilder().username(user)
@@ -206,8 +199,7 @@ public class MqttConnection {
 
     }
 
-    private void sslConnect() throws MqttException
-    {
+    private void sslConnect() throws MqttException {
 
         client = new MqttClient(broker, CLIENTID, persistence);
         options = new MqttConnectionOptionsBuilder().username(user)
@@ -219,8 +211,7 @@ public class MqttConnection {
         client.setCallback(callBackImpl);
 
         SSLSocketFactory sslSocketFactory = getSocketFactory();
-        if (Objects.nonNull(sslSocketFactory))
-        {
+        if (Objects.nonNull(sslSocketFactory)) {
             options.setSocketFactory(sslSocketFactory);
             if (Constants.CertificateValidationType.IGNORE_CERTIFICATE
                     .equals(certValidationType))
@@ -234,10 +225,8 @@ public class MqttConnection {
 
     }
 
-    private SSLSocketFactory getSocketFactory()
-    {
-        switch (certValidationType)
-        {
+    private SSLSocketFactory getSocketFactory() {
+        switch (certValidationType) {
             case VALIDATE_CERTIFICATE:
                 return getSocketFactoryWithCertValidation(certificatePath);
 
@@ -247,19 +236,16 @@ public class MqttConnection {
         }
     }
 
-    private SSLSocketFactory getSocketFactoryWithCertValidation(String certPath)
-    {
+    private SSLSocketFactory getSocketFactoryWithCertValidation(String certPath) {
 
 
-        try
-        {
+        try {
             // Load CA certificate
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             X509Certificate caCert;
 
             try (BufferedInputStream bis =
-                         new BufferedInputStream(new FileInputStream(certPath)))
-            {
+                         new BufferedInputStream(new FileInputStream(certPath))) {
                 caCert = (X509Certificate) cf.generateCertificate(bis);
             }
 
@@ -279,33 +265,28 @@ public class MqttConnection {
 
             return sslContext.getSocketFactory();
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
 
     }
 
-    private SSLSocketFactory getSocketFactoryWithoutCert()
-    {
-        try
-        {
+    private SSLSocketFactory getSocketFactoryWithoutCert() {
+        try {
 
-            TrustManager[] trustAll = new TrustManager[] {new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers()
-                {
+            TrustManager[] trustAll = new TrustManager[]{new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[0];
                 }
 
                 public void checkClientTrusted(X509Certificate[] certs,
-                                               String authType)
-                {}
+                                               String authType) {
+                }
 
                 public void checkServerTrusted(X509Certificate[] certs,
-                                               String authType)
-                {}
+                                               String authType) {
+                }
             }};
 
             SSLContext context = SSLContext.getInstance("TLS");
@@ -313,35 +294,24 @@ public class MqttConnection {
             return context.getSocketFactory();
 
 
-        }
-        catch (Exception e)
-        {
-           e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
 
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
-    void publishData(String topic, String msg)
-    {
+    void publishData(String topic, String msg) {
 
         MqttMessage message = new MqttMessage(msg.getBytes());
         message.setQos(publishQOS);
-        try
-        {
-            client.publish(topic,message);
-            System.out.println("Message: "+msg+" published on topic: "+topic+" to mqtt Client: {} ");
+        try {
+            client.publish(topic, message);
+            System.out.println("Message: " + msg + " published on topic: " + topic + " to mqtt Client: {} ");
 
-        }
-        catch (MqttException e)
-        {
+        } catch (MqttException e) {
             System.err.println(
-                    "Exception: occured while publishing message request for Mqtt Client "+ e);
+                    "Exception: occured while publishing message request for Mqtt Client " + e);
             isConnected = false;
         }
     }
